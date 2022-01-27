@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.support.MessageSourceAccessor;
+
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
@@ -23,7 +24,7 @@ public class RegisterDTO {
     @Size(min = 7,max = 16,message = "长度为7-16字符")
     @NotBlank(message = "请输入您的密码")
     private String password;
-    @NotBlank(message = "请选择用户类型")
+
     private Integer userType;
 
 }
