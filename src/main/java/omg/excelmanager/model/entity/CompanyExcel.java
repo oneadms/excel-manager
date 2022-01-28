@@ -1,5 +1,7 @@
 package omg.excelmanager.model.entity;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
@@ -15,37 +17,43 @@ import java.io.Serializable;
 public class CompanyExcel implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @ExcelIgnore
     private Integer userId;
 
     /**
      * 项目类型
      */
+    @ExcelProperty("项目类型")
     private String projectType;
 
     /**
      * 学习能力总评
      */
+    @ExcelProperty("学习能力总评")
     private String overallReview;
 
     /**
      * 能力类别
      */
+    @ExcelProperty("能力类别")
     private String abilityCategory;
 
     /**
      * 评测分值
      */
+    @ExcelProperty("评测分值")
     private Double evaluationScore;
 
     /**
      * 同类均分
      */
+    @ExcelProperty("同类均分")
     private Double sameClass;
 
     /**
      * 对比差值
      */
+    @ExcelProperty("对比差值")
     private Double contrastDifference;
 
     public Integer getUserId() {
