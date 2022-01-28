@@ -1,10 +1,8 @@
 package omg.excelmanager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import jdk.nashorn.internal.parser.Token;
 import omg.excelmanager.common.exception.ApiAsserts;
-import omg.excelmanager.common.exception.ApiException;
-import omg.excelmanager.jwt.jwtUtil;
+import omg.excelmanager.jwt.JwtUtil;
 import omg.excelmanager.model.dto.LoginDTO;
 import omg.excelmanager.model.dto.RegisterDTO;
 import omg.excelmanager.model.entity.User;
@@ -26,6 +24,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public User getUserByUserName(String username) {
         return this.baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
+    }
+
+    @Override
+    public User getUserByUserId(String userid) {
+        return this.baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userid);
     }
 
     @Override
@@ -53,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         String token=null;
         if (user.getUsername().equals(loginDTO.getUsername())) {
-             token = jwtUtil.generateToken(user);
+             token = JwtUtil.generateToken(user);
 
         }
         return token;

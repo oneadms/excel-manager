@@ -2,15 +2,13 @@ package omg.excelmanager.controller;
 
 
 import com.alibaba.excel.EasyExcel;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import omg.excelmanager.common.api.ApiResult;
-import omg.excelmanager.common.exception.ApiAsserts;
-import omg.excelmanager.jwt.jwtUtil;
+import omg.excelmanager.jwt.JwtUtil;
 import omg.excelmanager.listener.CompanyExcelDataListener;
 import omg.excelmanager.model.entity.CompanyExcel;
-import omg.excelmanager.model.entity.CompanyExcel;
 import omg.excelmanager.model.entity.User;
-import omg.excelmanager.service.ICompanyExcelService;
 import omg.excelmanager.service.ICompanyExcelService;
 import omg.excelmanager.service.IUserService;
 import omg.excelmanager.utils.ExcelUtils;
@@ -24,7 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+
+import static omg.excelmanager.jwt.JwtUtil.USER_ID;
 
 /**
  * <p>
@@ -42,7 +41,8 @@ public class CompanyExcelController {
     private IUserService iUserService;
     @Autowired
     private ICompanyExcelService iCompanyExcelService;
-    private   String path;
+    private String path;
+
     public CompanyExcelController() {
         super();
         path = System.getProperty("CompanyExcel.dir") + "src/main/resources/export.excel";
@@ -52,38 +52,46 @@ public class CompanyExcelController {
     //总公司才能看到
     @RequestMapping("/list")
 
-    public ApiResult<List<CompanyExcel>> list(@ModelAttribute(name = "user") Map<String,Object> user) {
-        checkUser(user);
-        if (((Integer) user.get(jwtUtil.USER_TYPE)) == 1) {
+    public ApiResult<List<CompanyExcel>> list(@RequestHeader(value = USER_ID) String userid ) {
+        int userType = checkUser(userid);
+        if ( userType == 1) {
 
-            return ApiResult.success(iCompanyExcelService.list()) ;
+            return ApiResult.success(iCompanyExcelService.list());
+        }
+        return ApiResult.failed("您无权限查看");
+    }
+    //查看自己的
+    @RequestMapping("/list/self")
+    public ApiResult<List<CompanyExcel>> listSelf(@RequestHeader(value = USER_ID) String userid ) {
+        int userType = checkUser(userid);
+        if ( userType == 2||userType==1) {
+
+            return ApiResult.success(iCompanyExcelService.list(new LambdaQueryWrapper<CompanyExcel>().eq(CompanyExcel::getUserId, userid)));
         }
         return ApiResult.failed("您无权限查看");
     }
 
-    @RequestMapping("/add")
-    public ApiResult addExcel2Database(@ModelAttribute("user") Map<String,Object> user, @RequestBody @Valid CompanyExcel companyExcel){
-        checkUser(user);
-        if (((Integer) user.get(jwtUtil.USER_TYPE)) == 1||((Integer) user.get(jwtUtil.USER_TYPE)) == 2) {
+    @RequestMapping("/addExcel")
+    public ApiResult addExcel2Database(@RequestHeader(value = USER_ID) String userid, @RequestBody @Valid CompanyExcel companyExcel) {
+        int userType = checkUser(userid);
+        if ( userType == 1||userType==2) {
             iCompanyExcelService.save(companyExcel);
             return ApiResult.success("添加成功");
+
         }
-        return ApiResult.failed("添加失败");
+
+        return ApiResult.failed("你没有权限添加");
     }
 
-    private void checkUser(@ModelAttribute("user") Map<String, Object> user) {
-        if (null == user) {
-            ApiAsserts.fail("token无效");
-
+    //未登录返回-1.
+    //否则返回用户类型
+    private int checkUser(String userid) {
+        User user = iUserService.getUserByUserId(userid);
+        if (null == user
+        ) {
+            return -1;
         }
-        User checkUser = iUserService.getUserByUserName((String) user.get(jwtUtil.USER_NAME));
-        if (null == checkUser) {
-            ApiAsserts.fail("该用户不存在!");
-        }
-        if (!checkUser.getPassword().equals((String) user.get(jwtUtil.PASSWORD))) {
-            ApiAsserts.fail("青重新登录，您修改了密码");
-
-        }
+        return user.getUserType();
     }
 
     // easyexcel获取数据数据并导出Excel到浏览器下载下来
@@ -110,5 +118,17 @@ public class CompanyExcelController {
         return "文件导出成功";
     }
 
+    // easyexcel上传文件
+    @PostMapping("/upload")
+    @ResponseBody
+    public String upload(@RequestHeader(USER_ID)String userid,MultipartFile file) throws IOException {
+        int userType = checkUser(USER_ID);
+        if (userType == 1||userType==2
+        ) {
+            EasyExcel.read(file.getInputStream(), User.class, new CompanyExcelDataListener(iCompanyExcelService)).sheet().doRead();
+            return "上传成功";
+        }
+        return "您没有权限上传";
 
+    }
 }

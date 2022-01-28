@@ -2,16 +2,14 @@ package omg.excelmanager.controller;
 
 
 import omg.excelmanager.common.api.ApiResult;
+import omg.excelmanager.jwt.JwtUtil;
 import omg.excelmanager.model.dto.LoginDTO;
 import omg.excelmanager.model.dto.RegisterDTO;
+import omg.excelmanager.model.entity.User;
+import omg.excelmanager.model.vo.UserVo;
 import omg.excelmanager.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -50,6 +48,13 @@ public class UserController {
 
         }
         return ApiResult.failed("注册失败");
+    }
+
+    @GetMapping("/userinfo")
+    public ApiResult<UserVo> getUserInfo(@RequestHeader(value = JwtUtil.USER_ID)String userid ) {
+        User user = iUserService.getUserByUserId(userid);
+        UserVo response = UserVo.builder().username(user.getUsername()).nickname(user.getNickname()).userType(user.getUserType()).build();
+        return ApiResult.success(response);
     }
 
 
