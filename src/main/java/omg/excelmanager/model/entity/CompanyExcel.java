@@ -3,6 +3,10 @@ package omg.excelmanager.model.entity;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 
 /**
@@ -13,13 +17,20 @@ import java.io.Serializable;
  * @author oneadm
  * @since 2022-01-27
  */
+@Data
+@ToString
 @TableName("company_excel")
+@Accessors(chain = true)
 public class CompanyExcel implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @ExcelIgnore
     private Integer userId;
+    @ExcelIgnore
+    private Integer excelId;
+    @ExcelIgnore
 
+    private String excelTitle;
     /**
      * 项目类型
      */
@@ -106,16 +117,4 @@ public class CompanyExcel implements Serializable {
         this.contrastDifference = contrastDifference;
     }
 
-    @Override
-    public String toString() {
-        return "CompanyExcel{" +
-            "userId=" + userId +
-            ", projectType=" + projectType +
-            ", overallReview=" + overallReview +
-            ", abilityCategory=" + abilityCategory +
-            ", evaluationScore=" + evaluationScore +
-            ", sameClass=" + sameClass +
-            ", contrastDifference=" + contrastDifference +
-        "}";
-    }
 }

@@ -27,10 +27,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public User getUserByUserId(String userid) {
-        return this.baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userid);
+    public User getUserByUserId(Integer userid) {
+        return this.baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userid));
     }
-
     @Override
     public boolean executeRegister(RegisterDTO registerDTO) {
         User user = getUserByUserName(registerDTO.getUsername());

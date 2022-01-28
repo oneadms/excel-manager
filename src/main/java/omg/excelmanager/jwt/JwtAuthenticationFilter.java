@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isProtectedUrl(HttpServletRequest request) {
         List<String> protectedPaths = new ArrayList<String>();
         protectedPaths.add("/user/userinfo");
+        protectedPaths.add("/user/userinfo/*");
         protectedPaths.add("/company_excel/addExcel");
         protectedPaths.add("/company_excel/upload");
         protectedPaths.add("/company_excel/list/self");

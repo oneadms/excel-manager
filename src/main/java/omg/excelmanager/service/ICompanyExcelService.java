@@ -2,6 +2,9 @@ package omg.excelmanager.service;
 
 import omg.excelmanager.model.entity.CompanyExcel;
 import com.baomidou.mybatisplus.extension.service.IService;
+import omg.excelmanager.model.vo.CompanyExcelVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ICompanyExcelService extends IService<CompanyExcel> {
 
+    List<CompanyExcelVO> listExcel();
 }

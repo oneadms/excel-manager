@@ -17,5 +17,5 @@ public interface IUserService extends IService<User> {
      String executeLogin(LoginDTO loginDTO);
      boolean executeRegister(RegisterDTO registerDTO);
      User getUserByUserName(String username);
-     User getUserByUserId(String userid);
+     User getUserByUserId(Integer userid);
 }

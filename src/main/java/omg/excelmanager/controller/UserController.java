@@ -1,6 +1,7 @@
 package omg.excelmanager.controller;
 
 
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import omg.excelmanager.common.api.ApiResult;
 import omg.excelmanager.jwt.JwtUtil;
 import omg.excelmanager.model.dto.LoginDTO;
@@ -51,11 +52,26 @@ public class UserController {
     }
 
     @GetMapping("/userinfo")
-    public ApiResult<UserVo> getUserInfo(@RequestHeader(value = JwtUtil.USER_ID)String userid ) {
+    public ApiResult<UserVo> getUserInfo(@RequestHeader(value = JwtUtil.USER_ID)Integer userid ) {
         User user = iUserService.getUserByUserId(userid);
         UserVo response = UserVo.builder().username(user.getUsername()).nickname(user.getNickname()).userType(user.getUserType()).build();
         return ApiResult.success(response);
     }
 
+    @GetMapping("/userinfo/{id}")
+    public ApiResult<UserVo> getUserInfoById(@RequestHeader(value = JwtUtil.USER_ID) Integer currentUserId,
+                                             @PathVariable("id")Integer queryId) {
+        if (ObjectUtils.isEmpty(queryId)) {
+            return ApiResult.failed("参数不能为空");
+        }
 
+        User currentUser = iUserService.getUserByUserId(currentUserId);
+
+        if (currentUser.getUserType() != 1) {
+            return ApiResult.failed("您没有权限查看其他用户信息");
+        }
+        User user = iUserService.getUserByUserId(queryId);
+        UserVo response = UserVo.builder().username(user.getUsername()).nickname(user.getNickname()).userType(user.getUserType()).build();
+        return ApiResult.success(response);
+    }
 }

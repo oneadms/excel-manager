@@ -6,6 +6,8 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import lombok.extern.slf4j.Slf4j;
 import omg.excelmanager.model.entity.CompanyExcel;
+import omg.excelmanager.model.pojo.Student;
+import omg.excelmanager.utils.easyexcel.StudentSheetWriteHandler;
 import org.apache.poi.util.IOUtils;
 
 import javax.servlet.ServletOutputStream;
@@ -14,6 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,7 +64,13 @@ public class ExcelUtils {
         excelName = URLEncoder.encode(excelName, "UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=" + excelName + ExcelTypeEnum.XLSX.getValue());
         //调用自适应列宽方法（util包里面的Custemhandler）
-        ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).registerWriteHandler(new Custemhandler()).build();
+
+
+        String excelTitle="";
+        if (data.size() > 0) {
+            excelTitle = ((CompanyExcel) data.get(0)).getExcelTitle();
+        }
+        ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).registerWriteHandler(new StudentSheetWriteHandler(excelTitle)).relativeHeadRowIndex(1).build();
         WriteSheet writeSheet = EasyExcel.writerSheet(0, sheetName).head(CompanyExcel.class).build();
         excelWriter.write(data, writeSheet);
         excelWriter.finish();
